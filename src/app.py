@@ -1,4 +1,5 @@
 # IMPORTS
+from spyne.service import ServiceBase
 from spyne.application import Application
 from spyne.decorator import srpc
 from spyne.protocol.soap import Soap12
@@ -10,14 +11,18 @@ import os
 
 # bando de dados
 DATABASE = "database.db"
+
 # criar tabelas
 
-
+# users: ip, nome, idade
+# music: id, nome, artista
+# playlist: id, nome, user_id(foreignkey)
+# playlist_music: playlist_id(foreignkey), user_id(foreignkey), primarykey(playlist_id, music_id)
 
 def create_tables():
     conn = None
     try:
-        conn = sqlite3.Connection(DATABASE)
+        conn = sqlite3.connect(DATABASE)
         cur = conn.cursor()
 
         print("Criando tabelas...")
@@ -25,7 +30,7 @@ def create_tables():
         # tabela usuários
         cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
-            ip INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
             idade INTEGER
         )
@@ -80,15 +85,15 @@ else:
     print(f"Database '{DATABASE}' já existe, criando tabelas.")
     create_tables()
 
-class Servico(Application):
+class Servico(ServiceBase):
     # adicionar usuário com nome e idade a tabela users
     @srpc(Unicode, Integer, _returns=Unicode)
-    def add_user(ctx, nome, idade):
+    def add_user(nome, idade):
         con = None
         try:
             con = sqlite3.connect(DATABASE)
             cursor = con.cursor()
-            cursor.execute("INSERT INTO users (nome, idade) VAlUES (?, ?)", (nome, idade))
+            cursor.execute("INSERT INTO users (nome, idade) VALUES (?, ?)", (nome, idade))
             con.commit()
             print(f"Usuário '{nome}' adicionado")
             return f"Usuário '{nome}' adicionado com sucesso"
@@ -102,7 +107,7 @@ class Servico(Application):
     # Adicionar musica para a tabela de musicas
 
     @srpc(Unicode, Unicode, _returns=Unicode)
-    def add_music(ctx, nome, artista):
+    def add_music(nome, artista):
         con = None
         try:
             con = sqlite3.connect(DATABASE)
@@ -120,7 +125,7 @@ class Servico(Application):
 
 
     @srpc(Unicode, Integer, _returns=Unicode)
-    def create_playlist(ctx, nome, user_id):
+    def create_playlist(nome, user_id):
         con = None
         try:
             con = sqlite3.connect(DATABASE)
@@ -135,7 +140,7 @@ class Servico(Application):
             # com o id do usuário confirmado, adicionar playlist com foreign key
             cursor.execute("INSERT INTO playlist (nome, user_id) VALUES (?, ?)", (nome, user_id))
             con.commit()
-            print(f"Playlist '{nome}' foir criada com sucesso, associada ao usuário de id '{user_id}'")
+            print(f"Playlist '{nome}' foi criada com sucesso, associada ao usuário de id '{user_id}'")
             return f"Sucesso ao criar playlist '{nome}' associada ao usuário de id '{user_id}'"
 
         except sqlite3.Error as e:
@@ -148,7 +153,7 @@ class Servico(Application):
 
     # adicionar música a playlist
     @srpc(Integer, Integer, _returns=Unicode)
-    def add_music_to_playlist(ctx, playlist_id, music_id):
+    def add_music_to_playlist(playlist_id, music_id):
         con = None
         try:
             con = sqlite3.connect(DATABASE)
@@ -172,6 +177,9 @@ class Servico(Application):
             con.commit()
             print(f"Sucesso ao adicionar musica de id '{music_id}' para a playlist de id '{playlist_id}'")
             return f"Música '{music_id}' adicionada a '{playlist_id}' com sucessso"
+        except sqlite3.IntegrityError as e:
+            print(f"Erro de integridade ao adicionar musica de id '{music_id}' para a playlist de id '{playlist_id}': {e}")
+            return f"Erro de integridade ao adicionar musica de id '{music_id}' para a playlist de id '{playlist_id}': {e}"
         except sqlite3.Error as e:
             print(f"Erro ao adicionar musica de id '{music_id}' para a playlist de id '{playlist_id}': {e}")
             return f"Erro ao adicionar musica de id '{music_id}' para a playlist de id '{playlist_id}'"
@@ -179,8 +187,19 @@ class Servico(Application):
             if con:
                 con.close()
 
+application = Application([Servico],
+                tns="servico.spyne.python",
+                in_protocol=Soap12(validator="lxml"),
+                out_protocol=Soap12())
+
+wsgi_app = WsgiApplication(application)
 
 
+if __name__ == "__main__":
+    from wsgiref.simple_server import make_server
+
+    server = make_server('0.0.0.0', 8000, wsgi_app)
+    server.serve_forever()
 
 
 
