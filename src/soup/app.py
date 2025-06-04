@@ -104,19 +104,17 @@ class Playlist(ComplexModel):
     nome = Unicode
     user_id = Integer
 
-# 🎯 Classe base com suporte a CORS
+
 class CorsService(ServiceBase):
-    origin = '*'  # Pode colocar um domínio específico se quiser restringir
+    origin = '*'  
 
-
-# 🔥 Listener para adicionar os headers de CORS nas respostas
 def _on_method_return_object(ctx):
     ctx.transport.resp_headers['Access-Control-Allow-Origin'] = CorsService.origin
     ctx.transport.resp_headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     ctx.transport.resp_headers['Access-Control-Allow-Headers'] = 'Content-Type, SOAPAction'
 
 
-# ✅ Listener para lidar com requisições OPTIONS (pré-flight)
+
 def _on_method_call(ctx):
     if ctx.transport.req_env['REQUEST_METHOD'] == 'OPTIONS':
         ctx.out_string = b''
