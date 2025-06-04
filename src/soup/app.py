@@ -104,7 +104,38 @@ class Playlist(ComplexModel):
     nome = Unicode
     user_id = Integer
 
-class Servico(ServiceBase):
+# 🎯 Classe base com suporte a CORS
+class CorsService(ServiceBase):
+    origin = '*'  # Pode colocar um domínio específico se quiser restringir
+
+
+# 🔥 Listener para adicionar os headers de CORS nas respostas
+def _on_method_return_object(ctx):
+    ctx.transport.resp_headers['Access-Control-Allow-Origin'] = CorsService.origin
+    ctx.transport.resp_headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    ctx.transport.resp_headers['Access-Control-Allow-Headers'] = 'Content-Type, SOAPAction'
+
+
+# ✅ Listener para lidar com requisições OPTIONS (pré-flight)
+def _on_method_call(ctx):
+    if ctx.transport.req_env['REQUEST_METHOD'] == 'OPTIONS':
+        ctx.out_string = b''
+        ctx.transport.resp_headers['Access-Control-Allow-Origin'] = CorsService.origin
+        ctx.transport.resp_headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+        ctx.transport.resp_headers['Access-Control-Allow-Headers'] = 'Content-Type, SOAPAction'
+        ctx.transport.resp_status = 200
+        ctx.transport.close()
+        raise Exception("CORS preflight response")
+
+
+# 🔗 Conectando os listeners aos eventos do Spyne
+CorsService.event_manager.add_listener('method_return_object', _on_method_return_object)
+CorsService.event_manager.add_listener('method_call', _on_method_call)
+
+
+
+
+class Servico(CorsService):
     # adicionar usuário com nome e idade a tabela users
     @srpc(Unicode, Integer, _returns=Unicode)
     def add_user(nome, idade):
