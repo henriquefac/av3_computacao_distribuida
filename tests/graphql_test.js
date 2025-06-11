@@ -22,6 +22,36 @@ const queries = {
                 idade
             }
         }
+    `,
+    listAllMusic: gql`
+        query {
+            listAllMusic {
+                id
+                titulo
+                artista
+            }
+        }
+    `,
+    listUserPlaylists: gql`
+        query($userId: ID!) {
+            listUserPlaylists(userId: $userId) {
+                id
+                nome
+                musicas {
+                    id
+                    titulo
+                }
+            }
+        }
+    `,
+    listPlaylistMusic: gql`
+        query($playlistId: ID!) {
+            listPlaylistMusic(playlistId: $playlistId) {
+                id
+                titulo
+                artista
+            }
+        }
     `
 };
 
@@ -47,13 +77,24 @@ const testScenarios = [
         }
     },
     {
-        name: 'Adicionar Usuário',
+        name: 'Listar Todas as Músicas',
         fn: async () => {
             const client = new GraphQLClient(CONFIG.endpoint);
-            await client.request(mutations.addUser, {
-                nome: `Test User ${Math.random()}`,
-                idade: 30
-            });
+            await client.request(queries.listAllMusic);
+        }
+    },
+    {
+        name: 'Listar Playlists do Usuário',
+        fn: async () => {
+            const client = new GraphQLClient(CONFIG.endpoint);
+            await client.request(queries.listUserPlaylists, { userId: '1' });
+        }
+    },
+    {
+        name: 'Listar Músicas da Playlist',
+        fn: async () => {
+            const client = new GraphQLClient(CONFIG.endpoint);
+            await client.request(queries.listPlaylistMusic, { playlistId: '1' });
         }
     }
 ];
@@ -185,6 +226,13 @@ function generateHTMLReport(results) {
                     }]
                 },
                 options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Total de Requisições por Cenário'
+                        }
+                    },
                     scales: {
                         y: {
                             beginAtZero: true
@@ -207,6 +255,13 @@ function generateHTMLReport(results) {
                     }]
                 },
                 options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Tempo Médio de Resposta por Cenário'
+                        }
+                    },
                     scales: {
                         y: {
                             beginAtZero: true
@@ -229,6 +284,13 @@ function generateHTMLReport(results) {
                     }]
                 },
                 options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Taxa de Sucesso por Cenário'
+                        }
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
