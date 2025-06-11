@@ -1,4 +1,6 @@
 **/.venv/**
 **/database.db
+**/backend/data/**
+**/backend/src/graphql/__pycache__/**
 **/tests/node_modules/**
 **/frontend/node_modules/**
