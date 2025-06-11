@@ -1,0 +1,14 @@
+{
+  "name": "soap-load-tests",
+  "version": "1.0.0",
+  "description": "Load tests for SOAP service",
+  "main": "load_test.js",
+  "scripts": {
+    "test": "node load_test.js"
+  },
+  "dependencies": {
+    "autocannon": "^7.15.0",
+    "graphql-request": "^7.2.0",
+    "strong-soap": "^1.0.0"
+  }
+}

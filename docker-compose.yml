@@ -2,30 +2,51 @@ version: "3.9"
 
 services:
   soap-server:
-    image: python:3.10-slim-buster
-    container_name: python-spyne-sqlite-server
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: python-soap-server
     working_dir: /app
-
+    networks:
+      - app-network
     volumes:
-      - ./src:/app
+      - ./backend:/app
       - ./data:/app/data
-
     ports:
       - "8000:8000"
-
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8000/?wsdl"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 20s
-
-    # Corrigido o entrypoint para garantir que é uma única string válida para bash
-    entrypoint: >
-      bash -c " \
-      apt-get update && apt-get install -y sqlite3 && \
-      pip install --upgrade pip && \
-      pip install -r /app/requirements.txt && \
-      gunicorn --bind 0.0.0.0:8000 --workers 4 app:wsgi_app --log-level info \
-      "
+    environment:
+      - PYTHONUNBUFFERED=1
     restart: unless-stopped
+
+  graphql-server:
+    build:
+      context: ./backend
+      dockerfile: src/graphql/Dockerfile
+    container_name: python-graphql-server
+    working_dir: /app
+    networks:
+      - app-network
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+    ports:
+      - "8001:8000"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8000/graphql"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge

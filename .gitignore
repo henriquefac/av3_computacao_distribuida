@@ -1,2 +1,4 @@
 **/.venv/**
 **/database.db
+**/tests/node_modules/**
+**/frontend/node_modules/**
