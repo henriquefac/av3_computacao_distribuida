@@ -3,7 +3,7 @@
     <html lang="pt-BR">
     <head>
         <meta charset="UTF-8">
-        <title>Relatório de Testes de Carga - Serviço GraphQL</title>
+        <title>Relatório de Testes de Carga - Serviço REST</title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <style>
             body {
@@ -46,7 +46,7 @@
     </head>
     <body>
         <div class="container">
-            <h1>Relatório de Testes de Carga - Serviço GraphQL</h1>
+            <h1>Relatório de Testes de Carga - Serviço REST</h1>
             <h2>Configuração dos Testes</h2>
             <table>
                 <tr>
@@ -98,88 +98,48 @@
                     <tr>
                         <td>Listar Usuários</td>
                         <td>Leitura</td>
-                        <td>69382</td>
+                        <td>22308</td>
                         <td>0</td>
                         <td>100.00%</td>
-                        <td>42.70ms</td>
-                        <td>2313.20</td>
+                        <td>133.69ms</td>
+                        <td>743.60</td>
                     </tr>
                 
                     <tr>
                         <td>Listar Todas as Músicas</td>
                         <td>Leitura</td>
-                        <td>68030</td>
+                        <td>18063</td>
                         <td>0</td>
                         <td>100.00%</td>
-                        <td>43.55ms</td>
-                        <td>2268.24</td>
+                        <td>165.16ms</td>
+                        <td>602.10</td>
                     </tr>
                 
                     <tr>
                         <td>Listar Playlists do Usuário</td>
                         <td>Leitura</td>
-                        <td>67960</td>
+                        <td>15143</td>
                         <td>0</td>
                         <td>100.00%</td>
-                        <td>43.58ms</td>
-                        <td>2265.67</td>
+                        <td>196.98ms</td>
+                        <td>504.77</td>
                     </tr>
                 
                     <tr>
                         <td>Listar Músicas da Playlist</td>
                         <td>Leitura</td>
-                        <td>68777</td>
+                        <td>70355</td>
                         <td>0</td>
                         <td>100.00%</td>
-                        <td>43.07ms</td>
-                        <td>2292.94</td>
-                    </tr>
-                
-                    <tr>
-                        <td>Criar Usuário</td>
-                        <td>Criação</td>
-                        <td>68563</td>
-                        <td>0</td>
-                        <td>100.00%</td>
-                        <td>43.21ms</td>
-                        <td>2286.00</td>
-                    </tr>
-                
-                    <tr>
-                        <td>Criar Música</td>
-                        <td>Criação</td>
-                        <td>67845</td>
-                        <td>0</td>
-                        <td>100.00%</td>
-                        <td>43.67ms</td>
-                        <td>2262.20</td>
-                    </tr>
-                
-                    <tr>
-                        <td>Criar Playlist</td>
-                        <td>Criação</td>
-                        <td>69026</td>
-                        <td>0</td>
-                        <td>100.00%</td>
-                        <td>42.92ms</td>
-                        <td>2301.37</td>
-                    </tr>
-                
-                    <tr>
-                        <td>Adicionar Música à Playlist</td>
-                        <td>Criação</td>
-                        <td>69360</td>
-                        <td>0</td>
-                        <td>100.00%</td>
-                        <td>42.71ms</td>
-                        <td>2312.27</td>
+                        <td>42.09ms</td>
+                        <td>2345.67</td>
                     </tr>
                 
             </table>
         </div>
 
         <script>
-            const results = [{"name":"Listar Usuários","requestCount":69382,"errorCount":0,"successRate":100,"avgResponseTime":42.7,"rps":2313.2},{"name":"Listar Todas as Músicas","requestCount":68030,"errorCount":0,"successRate":100,"avgResponseTime":43.55,"rps":2268.24},{"name":"Listar Playlists do Usuário","requestCount":67960,"errorCount":0,"successRate":100,"avgResponseTime":43.58,"rps":2265.67},{"name":"Listar Músicas da Playlist","requestCount":68777,"errorCount":0,"successRate":100,"avgResponseTime":43.07,"rps":2292.94},{"name":"Criar Usuário","requestCount":68563,"errorCount":0,"successRate":100,"avgResponseTime":43.21,"rps":2286},{"name":"Criar Música","requestCount":67845,"errorCount":0,"successRate":100,"avgResponseTime":43.67,"rps":2262.2},{"name":"Criar Playlist","requestCount":69026,"errorCount":0,"successRate":100,"avgResponseTime":42.92,"rps":2301.37},{"name":"Adicionar Música à Playlist","requestCount":69360,"errorCount":0,"successRate":100,"avgResponseTime":42.71,"rps":2312.27}];
+            const results = [{"name":"Listar Usuários","requestCount":22308,"errorCount":0,"successRate":100,"avgResponseTime":133.69,"rps":743.6},{"name":"Listar Todas as Músicas","requestCount":18063,"errorCount":0,"successRate":100,"avgResponseTime":165.16,"rps":602.1},{"name":"Listar Playlists do Usuário","requestCount":15143,"errorCount":0,"successRate":100,"avgResponseTime":196.98,"rps":504.77},{"name":"Listar Músicas da Playlist","requestCount":70355,"errorCount":0,"successRate":100,"avgResponseTime":42.09,"rps":2345.67}];
             
             // Gráfico de Requisições
             new Chart(document.getElementById('requestsChart'), {

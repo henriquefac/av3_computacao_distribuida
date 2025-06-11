@@ -10,20 +10,13 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements file
-COPY requirements.txt .
+COPY requirements-soap.txt .
+RUN pip install --no-cache-dir -r requirements-soap.txt
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the rest of the application
-COPY . .
-
-# Create data directory and ensure it's writable
+# Create data directory
 RUN mkdir -p /app/data && \
     chmod 777 /app/data
 
-# Expose port 8000
 EXPOSE 8000
 
-# Start the application
-CMD ["python", "src/soup/app.py"] 
+CMD ["python", "app.py"] 

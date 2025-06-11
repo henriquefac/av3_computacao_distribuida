@@ -1,9 +1,48 @@
+const autocannon = require('autocannon');
+const fs = require('fs');
+const path = require('path');
 
+// Configuration
+const CONFIG = {
+    duration: 30, // Test duration in seconds
+    connections: 100, // Number of concurrent connections
+    pipelining: 1, // Number of pipelined requests
+    timeout: 10, // Timeout in seconds
+    baseUrl: 'http://localhost:8002'
+};
+
+// Test scenarios
+const testScenarios = [
+    {
+        name: 'Listar Usuários',
+        method: 'GET',
+        path: '/users/'
+    },
+    {
+        name: 'Listar Todas as Músicas',
+        method: 'GET',
+        path: '/music/'
+    },
+    {
+        name: 'Listar Playlists do Usuário',
+        method: 'GET',
+        path: '/users/1/playlists/'
+    },
+    {
+        name: 'Listar Músicas da Playlist',
+        method: 'GET',
+        path: '/playlists/1/music/'
+    }
+];
+
+// Generate HTML report
+function generateHTMLReport(results) {
+    const html = `
     <!DOCTYPE html>
     <html lang="pt-BR">
     <head>
         <meta charset="UTF-8">
-        <title>Relatório de Testes de Carga - Serviço GraphQL</title>
+        <title>Relatório de Testes de Carga - Serviço REST</title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <style>
             body {
@@ -46,7 +85,7 @@
     </head>
     <body>
         <div class="container">
-            <h1>Relatório de Testes de Carga - Serviço GraphQL</h1>
+            <h1>Relatório de Testes de Carga - Serviço REST</h1>
             <h2>Configuração dos Testes</h2>
             <table>
                 <tr>
@@ -55,19 +94,19 @@
                 </tr>
                 <tr>
                     <td>Duração</td>
-                    <td>30 segundos</td>
+                    <td>${CONFIG.duration} segundos</td>
                 </tr>
                 <tr>
                     <td>Conexões Concorrentes</td>
-                    <td>100</td>
+                    <td>${CONFIG.connections}</td>
                 </tr>
                 <tr>
                     <td>Pipelining</td>
-                    <td>1</td>
+                    <td>${CONFIG.pipelining}</td>
                 </tr>
                 <tr>
                     <td>Timeout</td>
-                    <td>10 segundos</td>
+                    <td>${CONFIG.timeout} segundos</td>
                 </tr>
             </table>
 
@@ -94,92 +133,22 @@
                     <th>Tempo Médio de Resposta</th>
                     <th>Requisições por Segundo</th>
                 </tr>
-                
+                ${results.map(r => `
                     <tr>
-                        <td>Listar Usuários</td>
-                        <td>Leitura</td>
-                        <td>69382</td>
-                        <td>0</td>
-                        <td>100.00%</td>
-                        <td>42.70ms</td>
-                        <td>2313.20</td>
+                        <td>${r.name}</td>
+                        <td>${r.name.includes('Criar') || r.name.includes('Adicionar') ? 'Criação' : 'Leitura'}</td>
+                        <td>${r.requestCount}</td>
+                        <td>${r.errorCount}</td>
+                        <td>${r.successRate.toFixed(2)}%</td>
+                        <td>${r.avgResponseTime.toFixed(2)}ms</td>
+                        <td>${r.rps.toFixed(2)}</td>
                     </tr>
-                
-                    <tr>
-                        <td>Listar Todas as Músicas</td>
-                        <td>Leitura</td>
-                        <td>68030</td>
-                        <td>0</td>
-                        <td>100.00%</td>
-                        <td>43.55ms</td>
-                        <td>2268.24</td>
-                    </tr>
-                
-                    <tr>
-                        <td>Listar Playlists do Usuário</td>
-                        <td>Leitura</td>
-                        <td>67960</td>
-                        <td>0</td>
-                        <td>100.00%</td>
-                        <td>43.58ms</td>
-                        <td>2265.67</td>
-                    </tr>
-                
-                    <tr>
-                        <td>Listar Músicas da Playlist</td>
-                        <td>Leitura</td>
-                        <td>68777</td>
-                        <td>0</td>
-                        <td>100.00%</td>
-                        <td>43.07ms</td>
-                        <td>2292.94</td>
-                    </tr>
-                
-                    <tr>
-                        <td>Criar Usuário</td>
-                        <td>Criação</td>
-                        <td>68563</td>
-                        <td>0</td>
-                        <td>100.00%</td>
-                        <td>43.21ms</td>
-                        <td>2286.00</td>
-                    </tr>
-                
-                    <tr>
-                        <td>Criar Música</td>
-                        <td>Criação</td>
-                        <td>67845</td>
-                        <td>0</td>
-                        <td>100.00%</td>
-                        <td>43.67ms</td>
-                        <td>2262.20</td>
-                    </tr>
-                
-                    <tr>
-                        <td>Criar Playlist</td>
-                        <td>Criação</td>
-                        <td>69026</td>
-                        <td>0</td>
-                        <td>100.00%</td>
-                        <td>42.92ms</td>
-                        <td>2301.37</td>
-                    </tr>
-                
-                    <tr>
-                        <td>Adicionar Música à Playlist</td>
-                        <td>Criação</td>
-                        <td>69360</td>
-                        <td>0</td>
-                        <td>100.00%</td>
-                        <td>42.71ms</td>
-                        <td>2312.27</td>
-                    </tr>
-                
+                `).join('')}
             </table>
         </div>
 
         <script>
-            const results = [{"name":"Listar Usuários","requestCount":69382,"errorCount":0,"successRate":100,"avgResponseTime":42.7,"rps":2313.2},{"name":"Listar Todas as Músicas","requestCount":68030,"errorCount":0,"successRate":100,"avgResponseTime":43.55,"rps":2268.24},{"name":"Listar Playlists do Usuário","requestCount":67960,"errorCount":0,"successRate":100,"avgResponseTime":43.58,"rps":2265.67},{"name":"Listar Músicas da Playlist","requestCount":68777,"errorCount":0,"successRate":100,"avgResponseTime":43.07,"rps":2292.94},{"name":"Criar Usuário","requestCount":68563,"errorCount":0,"successRate":100,"avgResponseTime":43.21,"rps":2286},{"name":"Criar Música","requestCount":67845,"errorCount":0,"successRate":100,"avgResponseTime":43.67,"rps":2262.2},{"name":"Criar Playlist","requestCount":69026,"errorCount":0,"successRate":100,"avgResponseTime":42.92,"rps":2301.37},{"name":"Adicionar Música à Playlist","requestCount":69360,"errorCount":0,"successRate":100,"avgResponseTime":42.71,"rps":2312.27}];
+            const results = ${JSON.stringify(results)};
             
             // Gráfico de Requisições
             new Chart(document.getElementById('requestsChart'), {
@@ -255,4 +224,59 @@
         </script>
     </body>
     </html>
+    `;
+
+    fs.writeFileSync('relatorio_teste_carga_rest.html', html);
+    console.log('Relatório HTML gerado: relatorio_teste_carga_rest.html');
+}
+
+// Run load test for a single scenario
+async function runLoadTest(scenario) {
+    console.log(`\nExecutando teste de carga para: ${scenario.name}`);
     
+    const instance = autocannon({
+        url: `${CONFIG.baseUrl}${scenario.path}`,
+        method: scenario.method,
+        headers: {
+            'content-type': 'application/json'
+        },
+        body: scenario.body,
+        duration: CONFIG.duration,
+        connections: CONFIG.connections,
+        pipelining: CONFIG.pipelining,
+        timeout: CONFIG.timeout
+    });
+
+    return new Promise((resolve) => {
+        autocannon.track(instance, { renderProgressBar: true });
+        
+        instance.on('done', (results) => {
+            const result = {
+                name: scenario.name,
+                requestCount: results.requests.total,
+                errorCount: results.errors,
+                successRate: ((results.requests.total - results.errors) / results.requests.total) * 100,
+                avgResponseTime: results.latency.average,
+                rps: results.requests.average
+            };
+            resolve(result);
+        });
+    });
+}
+
+// Run all load tests
+async function runAllLoadTests() {
+    console.log('🚀 Iniciando testes de carga REST...');
+    
+    const results = [];
+    for (const scenario of testScenarios) {
+        const result = await runLoadTest(scenario);
+        results.push(result);
+    }
+
+    generateHTMLReport(results);
+    console.log('\n✅ Testes de carga concluídos!');
+}
+
+// Run the tests
+runAllLoadTests(); 

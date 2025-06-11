@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package music_service;
+
+service MusicService {
+  // User operations
+  rpc CreateUser (CreateUserRequest) returns (User) {}
+  rpc GetUser (GetUserRequest) returns (User) {}
+  rpc ListUsers (ListUsersRequest) returns (ListUsersResponse) {}
+
+  // Music operations
+  rpc CreateMusic (CreateMusicRequest) returns (Music) {}
+  rpc GetMusic (GetMusicRequest) returns (Music) {}
+  rpc ListMusic (ListMusicRequest) returns (ListMusicResponse) {}
+
+  // Playlist operations
+  rpc CreatePlaylist (CreatePlaylistRequest) returns (Playlist) {}
+  rpc GetPlaylist (GetPlaylistRequest) returns (Playlist) {}
+  rpc ListUserPlaylists (ListUserPlaylistsRequest) returns (ListPlaylistsResponse) {}
+  rpc AddMusicToPlaylist (AddMusicToPlaylistRequest) returns (Playlist) {}
+}
+
+// User messages
+message User {
+  int32 id = 1;
+  string nome = 2;
+  optional int32 idade = 3;
+}
+
+message CreateUserRequest {
+  string nome = 1;
+  int32 idade = 2;
+}
+
+message GetUserRequest {
+  int32 id = 1;
+}
+
+message ListUsersRequest {}
+
+message ListUsersResponse {
+  repeated User users = 1;
+}
+
+// Music messages
+message Music {
+  int32 id = 1;
+  string nome = 2;
+  optional string artista = 3;
+}
+
+message CreateMusicRequest {
+  string nome = 1;
+  string artista = 2;
+}
+
+message GetMusicRequest {
+  int32 id = 1;
+}
+
+message ListMusicRequest {}
+
+message ListMusicResponse {
+  repeated Music musics = 1;
+}
+
+// Playlist messages
+message Playlist {
+  int32 id = 1;
+  string nome = 2;
+  int32 user_id = 3;
+  repeated Music musics = 4;
+}
+
+message CreatePlaylistRequest {
+  string nome = 1;
+  int32 user_id = 2;
+}
+
+message GetPlaylistRequest {
+  int32 id = 1;
+}
+
+message ListUserPlaylistsRequest {
+  int32 user_id = 1;
+}
+
+message ListPlaylistsResponse {
+  repeated Playlist playlists = 1;
+}
+
+message AddMusicToPlaylistRequest {
+  int32 playlist_id = 1;
+  int32 music_id = 2;
+} 

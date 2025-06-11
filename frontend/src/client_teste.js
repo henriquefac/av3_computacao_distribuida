@@ -206,169 +206,214 @@ async function executarTestes() {
         console.log("\n--- Testando Operações de Consulta (READ) ---");
 
         // 1. Listar todos os usuários
-        console.log("\n-- Listando todos os usuários --");
-        try {
-            const usuarios = await new Promise((resolve, reject) => {
-                cliente.list_users((err, result) => {
-                    if (err) reject(err);
-                    else resolve(result);
-                });
-            });
-            
-            if (usuarios && usuarios.length > 0) {
-                usuarios.forEach(usuario => {
-                    console.log(`  ID do Usuário: ${usuario.id}, Nome: ${usuario.nome}, Idade: ${usuario.idade}`);
-                });
-            } else {
-                console.log("  Nenhum usuário encontrado.");
-            }
-        } catch (error) {
-            console.log("  Erro ao listar usuários:", error.message);
-        }
+console.log("\n-- Listando todos os usuários --");
+try {
+    const usuarios = await new Promise((resolve, reject) => {
+        cliente.list_users((err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+        });
+    });
 
-        // 2. Listar todas as músicas
-        console.log("\n-- Listando todas as músicas --");
-        try {
-            const musicas = await new Promise((resolve, reject) => {
-                cliente.list_all_music((err, result) => {
-                    if (err) reject(err);
-                    else resolve(result);
-                });
+    const usuariosList = usuarios?.list_usersResult;
+    if (usuariosList) {
+        const lista = Array.isArray(usuariosList) ? usuariosList : [usuariosList];
+        if (lista.length > 0) {
+            lista.forEach(usuario => {
+                console.log(`  ID do Usuário: ${usuario.id}, Nome: ${usuario.nome}, Idade: ${usuario.idade}`);
             });
-
-            if (musicas && musicas.length > 0) {
-                musicas.forEach(musica => {
-                    console.log(`  ID da Música: ${musica.id}, Nome: ${musica.nome}, Artista: ${musica.artista}`);
-                });
-            } else {
-                console.log("  Nenhuma música encontrada.");
-            }
-        } catch (error) {
-            console.log("  Erro ao listar músicas:", error.message);
+        } else {
+            console.log("  Nenhum usuário encontrado.");
         }
+    } else {
+        console.log("  Nenhum dado retornado.");
+    }
+} catch (error) {
+    console.log("  Erro ao listar usuários:", error.message);
+}
+
+console.log("\n-- Listando todas as músicas --");
+try {
+    const musicas = await new Promise((resolve, reject) => {
+        cliente.list_all_music((err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+        });
+    });
+
+    const musicasList = musicas?.list_all_musicResult;
+    if (musicasList) {
+        const lista = Array.isArray(musicasList) ? musicasList : [musicasList];
+        if (lista.length > 0) {
+            lista.forEach(musica => {
+                console.log(`  ID da Música: ${musica.id}, Nome: ${musica.nome}, Artista: ${musica.artista}`);
+            });
+        } else {
+            console.log("  Nenhuma música encontrada.");
+        }
+    } else {
+        console.log("  Nenhum dado retornado.");
+    }
+} catch (error) {
+    console.log("  Erro ao listar músicas:", error.message);
+}
 
         // 3. Listar playlists de um usuário (ex: user_id=1)
-        console.log("\n-- Listando playlists do Usuário ID 1 (Alice) --");
-        try {
-            const playlistsUsuario1 = await new Promise((resolve, reject) => {
-                cliente.list_user_playlists({ user_id: 1 }, (err, result) => {
-                    if (err) reject(err);
-                    else resolve(result);
-                });
+console.log("\n-- Listando playlists do Usuário ID 1 (Alice) --");
+try {
+    const playlists = await new Promise((resolve, reject) => {
+        cliente.list_user_playlists({ user_id: 1 }, (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+        });
+    });
+
+    const playlistsList = playlists?.list_user_playlistsResult;
+    if (playlistsList) {
+        const lista = Array.isArray(playlistsList) ? playlistsList : [playlistsList];
+        if (lista.length > 0) {
+            lista.forEach(playlist => {
+                console.log(`  ID da Playlist: ${playlist.id}, Nome: ${playlist.nome}, ID do Usuário: ${playlist.user_id}`);
             });
-
-            if (playlistsUsuario1 && playlistsUsuario1.length > 0) {
-                playlistsUsuario1.forEach(pl => {
-                    console.log(`  ID da Playlist: ${pl.id}, Nome: ${pl.nome}, ID do Usuário: ${pl.user_id}`);
-                });
-            } else {
-                console.log("  Nenhuma playlist encontrada para o usuário ID 1.");
-            }
-        } catch (error) {
-            console.log("  Erro ao listar playlists do usuário 1:", error.message);
+        } else {
+            console.log("  Nenhuma playlist encontrada para o usuário ID 1.");
         }
+    } else {
+        console.log("  Nenhum dado retornado.");
+    }
+} catch (error) {
+    console.log("  Erro ao listar playlists do usuário 1:", error.message);
+}
 
-        console.log("\n-- Listando playlists do Usuário ID 99 (inexistente) --");
-        try {
-            const playlistsUsuario99 = await new Promise((resolve, reject) => {
-                cliente.list_user_playlists({ user_id: 99 }, (err, result) => {
-                    if (err) reject(err);
-                    else resolve(result);
-                });
+console.log("\n-- Listando playlists do Usuário ID 99 (inexistente) --");
+try {
+    const playlistsUsuario99 = await new Promise((resolve, reject) => {
+        cliente.list_user_playlists({ user_id: 99 }, (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+        });
+    });
+
+    if (playlistsUsuario99) {
+        const list_playlistsUsuario99 = playlistsUsuario99["list_user_playlistsResult"];
+
+        if (Array.isArray(list_playlistsUsuario99) && list_playlistsUsuario99.length > 0) {
+            list_playlistsUsuario99.forEach(pl => {
+                console.log(`  ID da Playlist: ${pl.id}, Nome: ${pl.nome}, ID do Usuário: ${pl.user_id}`);
             });
-
-            if (playlistsUsuario99 && playlistsUsuario99.length > 0) {
-                playlistsUsuario99.forEach(pl => {
-                    console.log(`  ID da Playlist: ${pl.id}, Nome: ${pl.nome}, ID do Usuário: ${pl.user_id}`);
-                });
-            } else {
-                console.log("  Nenhuma playlist encontrada para o usuário ID 99 (esperado, lista vazia).");
-            }
-        } catch (error) {
-            console.log("  Erro ao listar playlists do usuário 99:", error.message);
+        } else {
+            console.log("  Nenhuma playlist encontrada para o usuário ID 99 (esperado, lista vazia).");
         }
+    } else {
+        console.log("  Sem resposta");
+    }
+} catch (error) {
+    console.log("  Erro ao listar playlists do usuário 99:", error.message);
+}
 
         // 4. Listar músicas de uma playlist (ex: playlist_id=1)
-        console.log("\n-- Listando músicas da Playlist ID 1 ('Favoritas da Alice') --");
-        try {
-            const musicasNaPl1 = await new Promise((resolve, reject) => {
-                cliente.list_playlist_music({ playlist_id: 1 }, (err, result) => {
-                    if (err) reject(err);
-                    else resolve(result);
-                });
+console.log("\n-- Listando músicas da Playlist ID 1 ('Favoritas da Alice') --");
+try {
+    const musicasNaPl1 = await new Promise((resolve, reject) => {
+        cliente.list_playlist_music({ playlist_id: 1 }, (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+        });
+    });
+
+    if (musicasNaPl1) {
+        const list_musicasNaPl1 = musicasNaPl1["list_playlist_musicResult"];
+        
+        if (Array.isArray(list_musicasNaPl1) && list_musicasNaPl1.length > 0) {
+            list_musicasNaPl1.forEach(musica => {
+                console.log(`  Música na Playlist ID 1: '${musica.nome}' por '${musica.artista}' (ID: ${musica.id})`);
             });
-
-            if (musicasNaPl1 && musicasNaPl1.length > 0) {
-                musicasNaPl1.forEach(musica => {
-                    console.log(`  Música na Playlist ID 1: '${musica.nome}' por '${musica.artista}' (ID: ${musica.id})`);
-                });
-            } else {
-                console.log("  Nenhuma música encontrada na playlist ID 1.");
-            }
-        } catch (error) {
-            console.log("  Erro ao listar músicas da playlist 1:", error.message);
+        } else {
+            console.log("  Nenhuma música encontrada na playlist ID 1.");
         }
+    } else {
+        console.log("  Sem resposta");
+    }
+} catch (error) {
+    console.log("  Erro ao listar músicas da playlist 1:", error.message);
+}
+console.log("\n-- Listando músicas da Playlist ID 99 (inexistente) --");
+try {
+    const musicasNaPl99 = await new Promise((resolve, reject) => {
+        cliente.list_playlist_music({ playlist_id: 99 }, (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+        });
+    });
 
-        console.log("\n-- Listando músicas da Playlist ID 99 (inexistente) --");
-        try {
-            const musicasNaPl99 = await new Promise((resolve, reject) => {
-                cliente.list_playlist_music({ playlist_id: 99 }, (err, result) => {
-                    if (err) reject(err);
-                    else resolve(result);
-                });
+    if (musicasNaPl99) {
+        const list_musicasNaPl99 = musicasNaPl99["list_playlist_musicResult"];
+
+        if (Array.isArray(list_musicasNaPl99) && list_musicasNaPl99.length > 0) {
+            list_musicasNaPl99.forEach(musica => {
+                console.log(`  Música na Playlist ID 99: '${musica.nome}' por '${musica.artista}' (ID: ${musica.id})`);
             });
-
-            if (musicasNaPl99 && musicasNaPl99.length > 0) {
-                musicasNaPl99.forEach(musica => {
-                    console.log(`  Música na Playlist ID 99: '${musica.nome}' por '${musica.artista}' (ID: ${musica.id})`);
-                });
-            } else {
-                console.log("  Nenhuma música encontrada na playlist ID 99 (esperado, lista vazia).");
-            }
-        } catch (error) {
-            console.log("  Erro ao listar músicas da playlist 99:", error.message);
+        } else {
+            console.log("  Nenhuma música encontrada na playlist ID 99 (esperado, lista vazia).");
         }
+    } else {
+        console.log("  Sem resposta");
+    }
+} catch (error) {
+    console.log("  Erro ao listar músicas da playlist 99:", error.message);
+}
 
-        // 5. Listar playlists que contêm uma música (ex: music_id=1)
-        console.log("\n-- Listando playlists que contêm a Música ID 1 ('O Ritmo da Vida') --");
-        try {
-            const playlistsComMusica1 = await new Promise((resolve, reject) => {
-                cliente.list_playlists_by_music({ music_id: 1 }, (err, result) => {
-                    if (err) reject(err);
-                    else resolve(result);
-                });
+// 5. Listar playlists que contêm uma música (ex: music_id=1)
+console.log("\n-- Listando playlists que contêm a Música ID 1 ('O Ritmo da Vida') --");
+try {
+    const playlistsComMusica1 = await new Promise((resolve, reject) => {
+        cliente.list_playlists_by_music({ music_id: 1 }, (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+        });
+    });
+
+    if (playlistsComMusica1) {
+        const list_playlistsComMusica1 = playlistsComMusica1["list_playlists_by_musicResult"];
+
+        if (Array.isArray(list_playlistsComMusica1) && list_playlistsComMusica1.length > 0) {
+            list_playlistsComMusica1.forEach(pl => {
+                console.log(`  Playlist com Música ID 1: ID ${pl.id}, Nome: '${pl.nome}' (ID do Usuário: ${pl.user_id})`);
             });
-
-            if (playlistsComMusica1 && playlistsComMusica1.length > 0) {
-                playlistsComMusica1.forEach(pl => {
-                    console.log(`  Playlist com Música ID 1: ID ${pl.id}, Nome: '${pl.nome}' (ID do Usuário: ${pl.user_id})`);
-                });
-            } else {
-                console.log("  Nenhuma playlist encontrada contendo a música ID 1.");
-            }
-        } catch (error) {
-            console.log("  Erro ao listar playlists com música 1:", error.message);
+        } else {
+            console.log("  Nenhuma playlist encontrada contendo a música ID 1.");
         }
+    } else {
+        console.log("  Sem resposta");
+    }
+} catch (error) {
+    console.log("  Erro ao listar playlists com música 1:", error.message);
+}
+console.log("\n-- Listando playlists que contêm a Música ID 99 (inexistente) --");
+try {
+    const playlistsComMusica99 = await new Promise((resolve, reject) => {
+        cliente.list_playlists_by_music({ music_id: 99 }, (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+        });
+    });
 
-        console.log("\n-- Listando playlists que contêm a Música ID 99 (inexistente) --");
-        try {
-            const playlistsComMusica99 = await new Promise((resolve, reject) => {
-                cliente.list_playlists_by_music({ music_id: 99 }, (err, result) => {
-                    if (err) reject(err);
-                    else resolve(result);
-                });
+    if (playlistsComMusica99) {
+        const list_playlistsComMusica99 = playlistsComMusica99["list_playlists_by_musicResult"];
+
+        if (Array.isArray(list_playlistsComMusica99) && list_playlistsComMusica99.length > 0) {
+            list_playlistsComMusica99.forEach(pl => {
+                console.log(`  Playlist com Música ID 99: ID ${pl.id}, Nome: '${pl.nome}' (ID do Usuário: ${pl.user_id})`);
             });
-
-            if (playlistsComMusica99 && playlistsComMusica99.length > 0) {
-                playlistsComMusica99.forEach(pl => {
-                    console.log(`  Playlist com Música ID 99: ID ${pl.id}, Nome: '${pl.nome}' (ID do Usuário: ${pl.user_id})`);
-                });
-            } else {
-                console.log("  Nenhuma playlist encontrada contendo a música ID 99 (esperado, lista vazia).");
-            }
-        } catch (error) {
-            console.log("  Erro ao listar playlists com música 99:", error.message);
+        } else {
+            console.log("  Nenhuma playlist encontrada contendo a música ID 99 (esperado, lista vazia).");    
         }
+    } else {
+        console.log("  Sem resposta");
+    }
+} catch (error) {
+    console.log("  Erro ao listar playlists com música 99:", error.message);
+}
 
     } catch (erro) {
         console.error("❌ Ocorreu um erro:", erro.message);
@@ -377,4 +422,4 @@ async function executarTestes() {
 }
 
 // Executar os testes
-executarTestes(); 
+executarTestes();
